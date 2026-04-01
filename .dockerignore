@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output (we build in container)
+dist/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Environment (use Docker secrets)
+.env
+.env.*
+
+# Secrets (mounted as volumes)
+secrets/
+
+# Data (mounted as volumes)
+data/
+uploads/
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+coverage/
+*.test.ts
+vitest.config.ts
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log

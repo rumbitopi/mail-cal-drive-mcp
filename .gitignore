@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Secrets (NEVER commit)
+secrets/master-key.txt
+secrets/api-key.txt
+*.pem
+*.key
+
+# Data
+data/
+uploads/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Claude Code
+.claude/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+.nyc_output/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+.vscode/

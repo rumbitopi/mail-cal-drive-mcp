@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: workspace_mcp
+      POSTGRES_USER: mcp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mcp -d workspace_mcp"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  workspace-mcp:
+    build:
+      context: .
+      target: production
+    ports:
+      - "127.0.0.1:3100:3100"
+    environment:
+      NODE_ENV: production
+      MCP_PORT: 3100
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://mcp:${POSTGRES_PASSWORD}@postgres:5432/workspace_mcp
+      CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY}
+      API_KEY: ${API_KEY}
+      MS_ENABLED: ${MS_ENABLED:-false}
+      MS_CLIENT_ID: ${MS_CLIENT_ID:-}
+      MS_TENANT_ID: ${MS_TENANT_ID:-common}
+      GOOGLE_ENABLED: ${GOOGLE_ENABLED:-false}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      IMAP_ENABLED: ${IMAP_ENABLED:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
