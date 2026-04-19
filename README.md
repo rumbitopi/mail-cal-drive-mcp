@@ -4,6 +4,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://docs.docker.com/compose/)
 [![MCP](https://img.shields.io/badge/MCP-2024--11--05-purple.svg)](https://modelcontextprotocol.io)
+[![SafeSkill 88/100](https://img.shields.io/badge/SafeSkill-88%2F100_Passes%20with%20Notes-yellow)](https://safeskill.dev/scan/rumbitopi-mail-cal-drive-mcp)
 
 A self-hosted [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for multi-account email, calendar, and cloud storage. Connect Microsoft 365, Google Workspace, and IMAP accounts to any MCP client — Claude Desktop, Claude Code, VS Code, Cursor, and more.
 
