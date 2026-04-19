@@ -259,7 +259,7 @@ No `auth_complete` needed — IMAP accounts are ready immediately.
 
 ---
 
-## MCP Tools (35 total)
+## MCP Tools (36 total)
 
 ### Authentication (4)
 
@@ -270,7 +270,7 @@ No `auth_complete` needed — IMAP accounts are ready immediately.
 | `auth_complete` | Complete pending authentication |
 | `auth_revoke` | Remove an account |
 
-### Email (9)
+### Email (10)
 
 | Tool | Description |
 |------|-------------|
@@ -278,6 +278,7 @@ No `auth_complete` needed — IMAP accounts are ready immediately.
 | `list_folders` | Get folders/labels for an account |
 | `list_messages` | Messages with pagination |
 | `get_message` | Full message with body and attachments |
+| `get_attachment` | Download attachment (text decoded, binary as blob) |
 | `search_messages` | Search with filters (see parameters below) |
 | `move_message` | Move to folder |
 | `delete_message` | Trash or permanent delete |
@@ -319,6 +320,16 @@ No `auth_complete` needed — IMAP accounts are ready immediately.
 ---
 
 ## Tool Parameter Reference
+
+### get_attachment
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `accountId` | string | Yes | Account ID |
+| `messageId` | string | Yes | Message ID |
+| `attachmentId` | string | Yes | Attachment ID from `get_message` |
+
+Returns text content for text-based files, or an MCP `EmbeddedResource` with `blob` for binary files (PDF, images, etc.). Max 5MB.
 
 ### search_messages
 

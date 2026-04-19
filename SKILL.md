@@ -5,7 +5,7 @@ description: "Use when you need to access email, calendar, or cloud drive. Provi
 
 # Workspace MCP — Agent Skill
 
-Access email, calendar, and cloud storage across Microsoft 365, Google Workspace, and IMAP accounts through MCP tools.
+Access email, calendar, and cloud storage across Microsoft 365, Google Workspace, and IMAP accounts through 36 MCP tools.
 
 ## When to Use This Skill
 
@@ -124,6 +124,13 @@ Before using any tool, check what accounts are available:
 |-------|----------|-------------|
 | `accountId` | Yes | Account ID |
 | `messageId` | Yes | Message ID from list/search |
+
+**`get_attachment`** — Download an attachment. Text files returned decoded; binary files (PDF, images) returned as MCP blob resources.
+| Param | Required | Description |
+|-------|----------|-------------|
+| `accountId` | Yes | Account ID |
+| `messageId` | Yes | Message ID |
+| `attachmentId` | Yes | Attachment ID from `get_message` |
 
 **`search_messages`** — Search across one or more accounts with rich filters.
 | Param | Required | Description |
@@ -261,6 +268,14 @@ Before using any tool, check what accounts are available:
 1. auth_status → get account IDs
 2. list_messages(accountId, folder: "INBOX", limit: 10) → recent messages
 3. get_message(accountId, messageId) → full content for important ones
+```
+
+### Download an attachment
+
+```
+1. auth_status → get account IDs
+2. get_message(accountId, messageId) → see attachments[] with IDs
+3. get_attachment(accountId, messageId, attachmentId) → text content or binary blob
 ```
 
 ### Schedule a meeting

@@ -48,7 +48,7 @@ DATABASE_URL=... CREDENTIAL_ENCRYPTION_KEY=... npm run migrate
 | `src/storage/msal-cache.ts` | MSAL cache plugin (Postgres) |
 | `src/storage/pending-flows.ts` | Pending auth flow storage |
 | `src/providers/` | Provider implementations |
-| `src/mcp/tools/` | MCP tool definitions (35 tools) |
+| `src/mcp/tools/` | MCP tool definitions (36 tools) |
 
 ## Environment Variables
 
@@ -89,10 +89,10 @@ IMAP_ENABLED=true
 - `auth_complete` - Complete pending authentication
 - `auth_revoke` - Remove account
 
-### Email (9 tools)
+### Email (10 tools)
 - `list_accounts`, `list_folders`, `list_messages`, `get_message`
-- `search_messages`, `move_message`, `delete_message`, `mark_read`
-- `bulk_mail_action`
+- `get_attachment`, `search_messages`, `move_message`, `delete_message`
+- `mark_read`, `bulk_mail_action`
 
 ### Calendar (8 tools)
 - `list_calendars`, `list_events`, `get_event`
