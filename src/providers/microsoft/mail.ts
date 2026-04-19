@@ -85,10 +85,10 @@ export class MicrosoftMailProvider implements IMailProvider {
   }
 
   async getAttachment(messageId: string, attachmentId: string): Promise<EmailAttachmentContent> {
-    // Get attachment metadata
+    // No $select — contentBytes only exists on the fileAttachment subtype,
+    // not the base attachment type. Let Graph return all fields.
     const meta = await this.client
       .api(`/me/messages/${messageId}/attachments/${attachmentId}`)
-      .select('id,name,contentType,size,contentBytes')
       .get();
 
     if (!meta) {
@@ -100,7 +100,7 @@ export class MicrosoftMailProvider implements IMailProvider {
       name: meta.name,
       contentType: meta.contentType,
       size: meta.size,
-      content: meta.contentBytes, // Graph API returns base64 directly
+      content: meta.contentBytes, // Graph API returns base64 on fileAttachment
     };
   }
 
