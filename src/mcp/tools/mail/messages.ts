@@ -101,6 +101,103 @@ export function registerMailMessageTools(server: McpServer): void {
     }
   );
 
+  // get_attachment - Download attachment content
+  server.tool(
+    'get_attachment',
+    'Download an email attachment as base64. Use get_message first to see attachment IDs.',
+    {
+      accountId: z.string().describe('The account ID'),
+      messageId: z.string().describe('The message ID'),
+      attachmentId: z.string().describe('The attachment ID from get_message'),
+    },
+    async (args) => {
+      try {
+        const registry = getProviderRegistry();
+        const provider = await registry.getProvider(args.accountId);
+
+        if (!provider) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: 'Account not found or not connected' }),
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        if (!provider.mail) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: 'Account does not support mail' }),
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const attachment = await provider.mail.getAttachment(
+          args.messageId,
+          args.attachmentId
+        );
+
+        // Guard: reject attachments over 5MB
+        const MAX_SIZE = 5 * 1024 * 1024;
+        if (attachment.size > MAX_SIZE) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: `Attachment too large (${(attachment.size / 1024 / 1024).toFixed(1)}MB). Maximum is 5MB.`,
+                  name: attachment.name,
+                  size: attachment.size,
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  id: attachment.id,
+                  name: attachment.name,
+                  contentType: attachment.contentType,
+                  size: attachment.size,
+                  content: attachment.content,
+                  encoding: 'base64',
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        logger.error('get_attachment failed', error);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+  );
+
   // get_message - Get full message details
   server.tool(
     'get_message',

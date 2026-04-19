@@ -8,6 +8,7 @@ import {
   EmailFolder,
   EmailMessage,
   EmailAddress,
+  EmailAttachmentContent,
   EmailSearchCriteria,
   BulkMailAction,
   BulkMailResult,
@@ -81,6 +82,26 @@ export class MicrosoftMailProvider implements IMailProvider {
     }
 
     return this.mapMessage(response, response.parentFolderId, true);
+  }
+
+  async getAttachment(messageId: string, attachmentId: string): Promise<EmailAttachmentContent> {
+    // Get attachment metadata
+    const meta = await this.client
+      .api(`/me/messages/${messageId}/attachments/${attachmentId}`)
+      .select('id,name,contentType,size,contentBytes')
+      .get();
+
+    if (!meta) {
+      throw new NotFoundError('microsoft', `Attachment ${attachmentId}`);
+    }
+
+    return {
+      id: meta.id,
+      name: meta.name,
+      contentType: meta.contentType,
+      size: meta.size,
+      content: meta.contentBytes, // Graph API returns base64 directly
+    };
   }
 
   async searchMessages(criteria: EmailSearchCriteria): Promise<EmailMessage[]> {

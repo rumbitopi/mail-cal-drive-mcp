@@ -6,6 +6,7 @@
 import {
   EmailFolder,
   EmailMessage,
+  EmailAttachmentContent,
   EmailSearchCriteria,
   BulkMailAction,
   BulkMailResult,
@@ -51,6 +52,11 @@ export interface IMailProvider {
    * Get a single message with full body
    */
   getMessage(messageId: string): Promise<EmailMessage>;
+
+  /**
+   * Get attachment content as base64
+   */
+  getAttachment(messageId: string, attachmentId: string): Promise<EmailAttachmentContent>;
 
   /**
    * Search messages across folders

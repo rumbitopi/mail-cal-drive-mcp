@@ -9,6 +9,7 @@ import {
   EmailFolder,
   EmailMessage,
   EmailAddress,
+  EmailAttachmentContent,
   EmailSearchCriteria,
   BulkMailAction,
   BulkMailResult,
@@ -82,6 +83,42 @@ export class GoogleMailProvider implements IMailProvider {
     }
 
     return this.mapMessage(response.data, 'INBOX', true);
+  }
+
+  async getAttachment(messageId: string, attachmentId: string): Promise<EmailAttachmentContent> {
+    // Get attachment content
+    const response = await this.gmail.users.messages.attachments.get({
+      userId: 'me',
+      messageId,
+      id: attachmentId,
+    });
+
+    if (!response.data || !response.data.data) {
+      throw new NotFoundError('google', `Attachment ${attachmentId}`);
+    }
+
+    // Get attachment metadata from the message
+    const msg = await this.gmail.users.messages.get({
+      userId: 'me',
+      id: messageId,
+      format: 'full',
+    });
+
+    const part = msg.data.payload?.parts?.find(
+      (p) => p.body?.attachmentId === attachmentId
+    );
+
+    // Gmail returns URL-safe base64 — convert to standard base64
+    const urlSafeBase64 = response.data.data;
+    const standardBase64 = urlSafeBase64.replace(/-/g, '+').replace(/_/g, '/');
+
+    return {
+      id: attachmentId,
+      name: part?.filename || 'attachment',
+      contentType: part?.mimeType || 'application/octet-stream',
+      size: response.data.size || 0,
+      content: standardBase64,
+    };
   }
 
   async searchMessages(criteria: EmailSearchCriteria): Promise<EmailMessage[]> {

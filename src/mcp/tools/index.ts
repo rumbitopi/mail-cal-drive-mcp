@@ -45,7 +45,7 @@ export function registerAllTools(server: McpServer): void {
   registerMailAccountTools(server);
   // list_folders
   registerMailFolderTools(server);
-  // list_messages, get_message
+  // list_messages, get_message, get_attachment
   registerMailMessageTools(server);
   // search_messages
   registerMailSearchTools(server);
@@ -74,7 +74,7 @@ export function registerAllTools(server: McpServer): void {
   // get_storage_quota
   registerDriveQuotaTools(server);
 
-  logger.info('MCP tools registered', { count: 35 });
+  logger.info('MCP tools registered', { count: 36 });
 }
 
 // Re-export for OAuth callback handling

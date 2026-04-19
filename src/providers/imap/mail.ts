@@ -9,6 +9,7 @@ import {
   EmailFolder,
   EmailMessage,
   EmailAddress,
+  EmailAttachmentContent,
   EmailSearchCriteria,
   BulkMailAction,
   BulkMailResult,
@@ -174,6 +175,48 @@ export class ImapMailProvider implements IMailProvider {
       // Parse the full message
       const parsed = await simpleParser(msg.source);
       return this.mapFullMessage(msg, parsed, folder);
+    } finally {
+      lock.release();
+    }
+  }
+
+  async getAttachment(messageId: string, attachmentId: string): Promise<EmailAttachmentContent> {
+    const client = await this.getClient();
+
+    // messageId format: "folder:uid"
+    const [folder, uidStr] = messageId.split(':');
+    if (!folder || !uidStr) {
+      throw new NotFoundError('imap', `Invalid message ID: ${messageId}`);
+    }
+
+    const uid = parseInt(uidStr, 10);
+    const lock = await client.getMailboxLock(folder);
+
+    try {
+      const msg = await client.fetchOne(uid.toString(), {
+        source: true,
+      }, { uid: true });
+
+      if (!msg || !msg.source) {
+        throw new NotFoundError('imap', `Message ${messageId}`);
+      }
+
+      const parsed = await simpleParser(msg.source);
+      const attachment = parsed.attachments?.find(
+        (a) => (a.contentId || a.checksum || '') === attachmentId
+      );
+
+      if (!attachment) {
+        throw new NotFoundError('imap', `Attachment ${attachmentId}`);
+      }
+
+      return {
+        id: attachmentId,
+        name: attachment.filename || 'attachment',
+        contentType: attachment.contentType,
+        size: attachment.size,
+        content: attachment.content.toString('base64'),
+      };
     } finally {
       lock.release();
     }

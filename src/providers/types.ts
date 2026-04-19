@@ -36,6 +36,14 @@ export interface EmailAttachment {
   size: number;
 }
 
+export interface EmailAttachmentContent {
+  id: string;
+  name: string;
+  contentType: string;
+  size: number;
+  content: string; // base64-encoded
+}
+
 export interface EmailMessage {
   id: string;
   accountId: string;
