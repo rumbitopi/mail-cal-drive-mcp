@@ -104,7 +104,7 @@ export function registerMailMessageTools(server: McpServer): void {
   // get_attachment - Download attachment content
   server.tool(
     'get_attachment',
-    'Download an email attachment as base64. Use get_message first to see attachment IDs.',
+    'Download an email attachment. Returns text content for text types, or an embedded blob resource for binary files (PDF, images, etc). Use get_message first to see attachment IDs.',
     {
       accountId: z.string().describe('The account ID'),
       messageId: z.string().describe('The message ID'),
@@ -162,22 +162,49 @@ export function registerMailMessageTools(server: McpServer): void {
           };
         }
 
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(
-                {
-                  id: attachment.id,
+        // Text-based attachments: return as text content
+        const isText = attachment.contentType.startsWith('text/') ||
+          attachment.contentType === 'application/json' ||
+          attachment.contentType === 'application/xml' ||
+          attachment.contentType === 'application/javascript';
+
+        if (isText) {
+          const decoded = Buffer.from(attachment.content, 'base64').toString('utf8');
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
                   name: attachment.name,
                   contentType: attachment.contentType,
                   size: attachment.size,
-                  content: attachment.content,
-                  encoding: 'base64',
-                },
-                null,
-                2
-              ),
+                  content: decoded,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+
+        // Binary attachments: return as embedded blob resource
+        const uri = `attachment://${args.accountId}/${args.messageId}/${args.attachmentId}/${encodeURIComponent(attachment.name)}`;
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify({
+                name: attachment.name,
+                contentType: attachment.contentType,
+                size: attachment.size,
+              }),
+            },
+            {
+              type: 'resource' as const,
+              resource: {
+                uri,
+                mimeType: attachment.contentType,
+                blob: attachment.content,
+              },
             },
           ],
         };
